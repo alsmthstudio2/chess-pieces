@@ -160,6 +160,8 @@ renderer.toneMappingExposure=1.05;
 renderer.shadowMap.enabled=true;
 renderer.shadowMap.type=PHONE?T.PCFShadowMap:T.PCFSoftShadowMap;
 const scene=new T.Scene();
+/* v68b: phones only. PHONE_SIZE makes all pieces bigger; PHONE_SZ gives each piece its own size on top (1 = same). Desktop is unchanged */
+const PHONE_SIZE=1.4, PHONE_SZ={king:1.12,queen:1.05,knight:1,rook:0.95,rookB:0.88,pawnB:0.8};
 const camera=new T.PerspectiveCamera(26,1,0.1,200);
 camera.position.set(0,15,9.5);
 camera.lookAt(0,0,0);
@@ -314,7 +316,7 @@ const d=camera.position.length(), visH=2*d*Math.tan(T.MathUtils.degToRad(camera.
   
 const wpp=visH/H;                       // world units per pixel near the table centre
   
-scale=(sr.width*0.75*0.36*0.85*wpp)/1.98;   // v10: pieces 15% smaller        // king about a third of the photo tall
+scale=(sr.width*0.75*0.36*0.85*wpp)/1.98*(W<760?(window.__asPS||PHONE_SIZE):1);   // v10: pieces 15% smaller        // king about a third of the photo tall
   
 holders.forEach(h=>{
     
@@ -525,7 +527,7 @@ u.spin.rotation.y=u.ang+sc*0.8;
     
 u.hover+=((on?1:0)-u.hover)*0.08;
     
-h.scale.setScalar(scale*p.sz);
+h.scale.setScalar(scale*p.sz*(W<760&&PHONE_SZ[p.id]||1));
   
 });
   
@@ -1066,6 +1068,16 @@ for(var i=0;i<u.length;i++){ var d=Math.abs(u[i].getBoundingClientRect().left-l)
 var v=String(Math.min(b,N_DOTS-1)); if(document.documentElement.style.getPropertyValue('--as-dot')!==v) document.documentElement.style.setProperty('--as-dot',v); }
 function bind(){ var sc=document.querySelector('.as-scroll'); if(sc&&sc!==bound){ bound=sc; sc.addEventListener('scroll',window.__asT(mark),{passive:true}); mark(); } }
 bind(); setInterval(bind,1000);
+})();
+/* v68b: on phones, touches in the project row go to the row only (Cargo's slideshows were catching the swipe, so the row could not scroll) */
+(function(){
+if(window.__asOff.row) return;
+var st=document.createElement('style'); st.setAttribute('data-as-swipe','1');
+st.textContent='@media (max-width:760px){html .as-scroll,html .as-scroll *{touch-action:pan-x pan-y!important}}';
+document.head.appendChild(st);
+function stop(e){ if(e.type.indexOf('pointer')===0&&e.pointerType==='mouse') return; if(Math.min(innerWidth,screen.width||9999)>=760) return;
+var t=e.target; if(t&&t.closest&&t.closest('.as-scroll')) e.stopPropagation(); }
+['touchstart','touchmove','touchend','pointerdown','pointermove','pointerup'].forEach(function(n){ document.addEventListener(n,stop,{capture:true,passive:true}); });
 })();
 /* v60: drag the project row sideways with the mouse (hand cursor) */
 (function(){

@@ -1048,9 +1048,11 @@ var VID='https://freight.cargo.site/t/original/i/C322576821321281469994034794656
 var PIC_MS=5000, t=null, box=null, im=null, vd=null, seen=false, io=null;
 function show(which){
 if(!box) return; clearTimeout(t);
-im.style.opacity=which==='img'?'1':'0'; vd.style.opacity=which==='vid'?'1':'0';
+if(which==='img'){ im.style.opacity='1'; vd.style.opacity='0'; }
 if(which==='img'){ try{vd.pause();}catch(e){} if(seen) t=setTimeout(function(){show('vid');},PIC_MS); return; }
 if(!vd.getAttribute('src')){ vd.src=VID; }
+/* v61c: keep the picture up until the video is actually playing (no black gap) */
+vd.addEventListener('playing',function(){ im.style.opacity='0'; vd.style.opacity='1'; },{once:true});
 try{vd.currentTime=0;}catch(e){}
 var p=vd.play(); if(p&&p.catch) p.catch(function(){});
 t=setTimeout(function(){ show('img'); },15000);
@@ -1059,17 +1061,19 @@ function build(){
 var wk=document.querySelector('.as-wk[data-id="p-disintegrator"]'); if(!wk) return;
 var g=wk.querySelector('gallery-slideshow'); if(g&&g.style.display!=='none') g.style.display='none';
 if(box&&box.isConnected&&box.parentNode===wk) return;
-[].forEach.call(wk.querySelectorAll('.as-dz'),function(o){o.remove();});
+[].forEach.call(wk.querySelectorAll('.as-dz'),function(o){ if(o!==box) o.remove(); });
+/* v61c: when Cargo redraws, put the same (already loaded) picture back instead of making a new one, so it never blinks */
+if(box){ wk.insertBefore(box,wk.firstChild); if(io){ io.disconnect(); io.observe(box); } return; }
 box=document.createElement('div'); box.className='as-dz';
 box.style.cssText='display:grid;width:100%;align-items:end';
-im=document.createElement('img'); im.loading='lazy'; im.decoding='async'; im.alt='Disintegrator'; im.addEventListener('error',function(){ if(im.src!==IMG0) im.src=IMG0; }); im.src=IMG;
+im=document.createElement('img'); im.alt='Disintegrator'; im.addEventListener('error',function(){ if(im.src!==IMG0) im.src=IMG0; }); im.src=IMG;
 vd=document.createElement('video'); vd.muted=true; vd.playsInline=true; vd.preload='none';   // v61: the video file only downloads once the project row is on screen
 vd.setAttribute('muted',''); vd.setAttribute('playsinline','');
 [im,vd].forEach(function(el){ el.style.cssText='grid-area:1/1;width:100%;height:auto;display:block;transition:none'; box.appendChild(el); });
 vd.addEventListener('ended',function(){ show('img'); });
 wk.insertBefore(box,wk.firstChild);
 show('img');
-if(io) io.disconnect(); if('IntersectionObserver' in window){ io=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting&&!seen){ seen=true; show('img'); } }); },{rootMargin:'200px'}); io.observe(box); } else { seen=true; show('img'); }
+if(io) io.disconnect(); if('IntersectionObserver' in window){ io=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting&&!seen){ seen=true; vd.preload='auto'; vd.src=VID; show('img'); } }); },{rootMargin:'200px'}); io.observe(box); } else { seen=true; show('img'); }
 }
 build(); new MutationObserver(window.__asT(build)).observe(document.documentElement,{childList:true,subtree:true});
 })();

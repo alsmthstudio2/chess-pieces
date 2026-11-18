@@ -1146,3 +1146,10 @@ requestAnimationFrame(function(){ setTimeout(function(){ (window.__asQ||[]).spli
 }
 (function wait(){ if(window.__asShown) return; if(fontsIn||Date.now()-t0>600){ requestAnimationFrame(show); return; } setTimeout(wait,30); })();
 })();
+/* v61e: the podcast video (YouTube, about 1 MB of player code) loads only when the project row comes near the screen; looks the same once there */
+(function(){
+var io=('IntersectionObserver' in window)?new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ go(e.target); io.unobserve(e.target); } }); },{rootMargin:'300px 3000px 300px 3000px'}):null;
+function go(f){ var u=f.getAttribute('data-src'); if(u&&f.getAttribute('src')!==u) f.setAttribute('src',u); }
+function scan(){ [].forEach.call(document.querySelectorAll('iframe[data-src]'),function(f){ if(f.getAttribute('src')===f.getAttribute('data-src')) return; if(f.__asObs) return; f.__asObs=1; if(io) io.observe(f); else go(f); }); }
+scan(); new MutationObserver(window.__asT(scan)).observe(document.documentElement,{childList:true,subtree:true});
+})();

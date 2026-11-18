@@ -1079,44 +1079,45 @@ function stop(e){ if(e.type.indexOf('pointer')===0&&e.pointerType==='mouse') ret
 var t=e.target; if(t&&t.closest&&t.closest('.as-scroll')) e.stopPropagation(); }
 ['touchstart','touchmove','touchend','pointerdown','pointermove','pointerup'].forEach(function(n){ document.addEventListener(n,stop,{capture:true,passive:true}); });
 })();
-/* v68c: backup swipe for the phone row. If something on the page blocks the normal sideways scroll, the row follows the finger anyway
-   (when the normal scroll works, the row is already where the finger is and this does nothing) */
-(function(){
-if(window.__asOff.row) return;
-var sc=null,x0=0,y0=0,l0=0,dir=0,lx=0,lt=0,v=0,forced=false,raf=0;
-function ph(){ return Math.min(innerWidth,screen.width||9999)<760; }
-window.addEventListener('touchstart',function(e){ if(!ph()||e.touches.length!==1) return; var el=e.target.closest&&e.target.closest('.as-scroll'); if(!el||el.scrollWidth<=el.clientWidth+1){sc=null;return;}
-cancelAnimationFrame(raf); sc=el; x0=lx=e.touches[0].clientX; y0=e.touches[0].clientY; l0=el.scrollLeft; dir=0; v=0; forced=false; lt=Date.now(); },{capture:true,passive:true});
-window.addEventListener('touchmove',function(e){ if(!sc) return; var t=e.touches[0], dx=t.clientX-x0, dy=t.clientY-y0;
-if(!dir){ if(Math.abs(dx)<6&&Math.abs(dy)<6) return; dir=Math.abs(dx)>Math.abs(dy)?1:2; }
-if(dir!==1) return; var now=Date.now(); v=(t.clientX-lx)/Math.max(1,now-lt); lx=t.clientX; lt=now;
-var target=Math.max(0,Math.min(sc.scrollWidth-sc.clientWidth,l0-dx)); if(Math.abs(sc.scrollLeft-target)>2){ sc.scrollLeft=target; forced=true; } },{capture:true,passive:true});
-window.addEventListener('touchend',function(){ if(!sc) return; var el=sc; sc=null; if(!forced||dir!==1) return; var vel=v*16;
-(function glide(){ vel*=0.92; if(Math.abs(vel)<0.5) return; el.scrollLeft-=vel; raf=requestAnimationFrame(glide); })(); },{capture:true,passive:true});
-})();
-/* v68d: phone project row, three safety nets.
-   1. a see-through layer over each project picture, so touches land on the project (which opens it) and never on Cargo's slideshow
-   2. the row is held to exactly the screen width, so it always has something to scroll
-   3. if the row still cannot scroll, the projects stack one under another (the v66 phone layout) so nothing is out of reach */
+/* v68e: phone project row moves with the finger (the row slides; it does not rely on scrolling, which iPhone Safari would not do here).
+   A see-through layer over each picture sends touches to the project, never to Cargo's slideshow; a tap still opens the project.
+   On release the row settles on the nearest project. The dots follow. */
 (function(){
 if(window.__asOff.row) return;
 var st=document.createElement('style'); st.setAttribute('data-as-row3','1');
 st.textContent='@media (max-width:760px){html .as-wk{position:relative!important}html .as-wk:not(:has(iframe))::after{content:"";position:absolute;left:0;top:0;right:0;bottom:0;z-index:20;background:transparent}'+
-'html .as-scroll{box-sizing:border-box!important;-webkit-overflow-scrolling:touch}'+
-'html.as-stack .as-scroll>column-set{flex-direction:column!important;align-items:flex-start!important;gap:32px!important}html.as-stack .as-scroll column-unit{width:60vw!important;max-width:60vw!important}html.as-stack .as-scroll column-unit[span="4"]{width:85vw!important;max-width:85vw!important}html.as-stack .as-scroll::after{display:none!important}}';
+'html .as-scroll{overflow:hidden!important;touch-action:pan-y!important}html .as-scroll *{touch-action:pan-y!important}'+
+'html .as-scroll>column-set{transform:translate3d(var(--as-tx,0px),0,0)!important;will-change:transform}html.as-glide .as-scroll>column-set{transition:transform .35s cubic-bezier(.2,.7,.2,1)!important}'+
+'html .as-scroll::after{position:relative!important;left:0!important;width:100%!important}}';
 document.head.appendChild(st);
+var H=document.documentElement, tx=0, sc=null, x0=0, y0=0, t0=0, dir=0, lastX=0, lastT=0, v=0;
 function ph(){ return Math.min(innerWidth,screen.width||9999)<760; }
-var checked=0;
-function hold(){ var sc=document.querySelector('.as-scroll'); if(!sc) return;
-if(!ph()){ if(sc.style.getPropertyValue('width')){ sc.style.removeProperty('width'); sc.style.removeProperty('max-width'); sc.style.removeProperty('margin-left'); } return; }
-var vw=document.documentElement.clientWidth, r=sc.getBoundingClientRect();
-if(Math.abs(r.width-vw)>1||Math.abs(r.left)>1){ var ml=parseFloat(getComputedStyle(sc).marginLeft)||0;
-sc.style.setProperty('width',vw+'px','important'); sc.style.setProperty('max-width',vw+'px','important'); sc.style.setProperty('margin-left',(ml-r.left)+'px','important'); }
-var html=document.documentElement; if(html.classList.contains('as-stack')) return;
-checked++; if(checked<6) return;
-var cs=sc.querySelector('column-set'); if(!cs) return; var need=cs.scrollWidth>sc.clientWidth+20;
-if(!need) return; var was=sc.scrollLeft; sc.scrollLeft=was>0?was-1:was+1; var ok=sc.scrollLeft!==was; sc.scrollLeft=was;
-if(!ok) html.classList.add('as-stack'); }
+function parts(){ var s=document.querySelector('.as-scroll'); if(!s) return null; var cs=s.querySelector('column-set'); if(!cs) return null;
+var u=[].slice.call(cs.querySelectorAll(':scope > column-unit')); return {s:s,cs:cs,u:u}; }
+function off(P,i){ return P.u[i].offsetLeft-P.u[0].offsetLeft; }
+function maxT(P){ var n=P.u.length; if(!n) return 0; var c=getComputedStyle(P.s), inner=P.s.clientWidth-(parseFloat(c.paddingLeft)||0)-(parseFloat(c.paddingRight)||0);
+return Math.max(0,off(P,n-1)+P.u[n-1].offsetWidth-inner); }
+function setT(x){ tx=x; H.style.setProperty('--as-tx',(-x)+'px'); }
+function dots(P){ var b=0,bd=1e9; for(var i=0;i<P.u.length;i++){ var d=Math.abs(Math.min(off(P,i),maxT(P))-tx); if(d<bd){bd=d;b=i;} }
+var vv=String(Math.min(b,5)); if(H.style.getPropertyValue('--as-dot')!==vv) H.style.setProperty('--as-dot',vv); }
+window.addEventListener('touchstart',function(e){ if(!ph()||e.touches.length!==1){sc=null;return;} var t=e.target; if(!t||!t.closest||!t.closest('.as-scroll')){sc=null;return;}
+var P=parts(); if(!P){sc=null;return;} sc=P; H.classList.remove('as-glide'); x0=lastX=e.touches[0].clientX; y0=e.touches[0].clientY; t0=tx; dir=0; v=0; lastT=Date.now(); },{capture:true,passive:true});
+window.addEventListener('touchmove',function(e){ if(!sc) return; var t=e.touches[0], dx=t.clientX-x0, dy=t.clientY-y0;
+if(!dir){ if(Math.abs(dx)<6&&Math.abs(dy)<6) return; dir=Math.abs(dx)>Math.abs(dy)?1:2; }
+if(dir!==1) return; if(e.cancelable) e.preventDefault();
+var now=Date.now(); v=(t.clientX-lastX)/Math.max(1,now-lastT); lastX=t.clientX; lastT=now;
+var m=maxT(sc), x=t0-dx; if(x<0) x=x/3; if(x>m) x=m+(x-m)/3; setT(x); dots(sc); },{capture:true,passive:false});
+function end(){ if(!sc) return; var P=sc; sc=null; if(dir!==1) return; var m=maxT(P), aim=tx-v*250, best=0, bd=1e9;
+for(var i=0;i<P.u.length;i++){ var o=Math.min(off(P,i),m); var d=Math.abs(o-aim); if(d<bd){bd=d;best=o;} }
+if(aim>=m-4) best=m; H.classList.add('as-glide'); setT(Math.max(0,Math.min(m,best))); dots(P);
+var stopClick=function(ev){ ev.preventDefault(); ev.stopPropagation(); }; window.addEventListener('click',stopClick,{capture:true,once:true}); setTimeout(function(){ window.removeEventListener('click',stopClick,true); },400); }
+window.addEventListener('touchend',end,{capture:true,passive:true}); window.addEventListener('touchcancel',end,{capture:true,passive:true});
+function hold(){ var s=document.querySelector('.as-scroll'); if(!s) return;
+if(!ph()){ if(tx) setT(0); if(s.style.getPropertyValue('width')){ s.style.removeProperty('width'); s.style.removeProperty('max-width'); s.style.removeProperty('margin-left'); } return; }
+var vw=Math.min(document.documentElement.clientWidth,innerWidth,screen.width||9999), r=s.getBoundingClientRect();
+if(Math.abs(r.width-vw)>1||Math.abs(r.left)>1){ var ml=parseFloat(getComputedStyle(s).marginLeft)||0;
+s.style.setProperty('width',vw+'px','important'); s.style.setProperty('max-width',vw+'px','important'); s.style.setProperty('margin-left',(ml-r.left)+'px','important'); }
+var P=parts(); if(P){ var m=maxT(P); if(tx>m) setT(m); } }
 hold(); setInterval(hold,500); addEventListener('resize',hold);
 })();
 /* v60: drag the project row sideways with the mouse (hand cursor) */

@@ -58,7 +58,7 @@ addStyle();addStyle8();
 let nst=null,tst=null,wasN=null,wst8=null,nst8=null;
 function narrow(w,svg){
   
-if(!nst||!nst.isConnected){nst=document.createElement('style');nst.dataset.ascN='1';nst.textContent=".asc.asc{grid-template-columns:minmax(0,1fr);row-gap:40px;margin-top:40px}\n.asc .asc-cards{padding:0;display:grid;grid-template-columns:minmax(0,1fr)!important;gap:36px}\n.asc .asc-title{grid-column:1/-1;font-size:36px!important}\nhtml .aal .aal-top{padding-top:24px!important}\nhtml .aal .aal-ag{position:absolute!important;top:0;transform:translateX(-50%)!important;display:block;margin:0;font-size:9.5px!important;letter-spacing:.03em!important}\nhtml .aal .aal-line{display:block!important}\nhtml .aal .aal-ag:first-child{transform:translateX(-40%)!important}\nhtml .aal-label,html .as-index-toggle{font-size:32px!important}\nhtml .asc .asc-card{width:auto!important;max-width:none!important;grid-column:1/-1!important}\nhtml .ab-open{top:18px!important;right:16px!important;font-size:20px!important}\nhtml .ab-sheet{display:block!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch;width:100vw!important}\nhtml .ab-photos{width:100%!important;border-right:0!important}\nhtml .ab-strip img{height:320px}\nhtml .ab-text{display:block!important;overflow:visible!important;padding:28px 20px 48px!important}\nhtml .as-index thead{display:none!important}\nhtml .as-index table,html .as-index tbody,html .as-index tr,html .as-index td{display:block!important;width:auto!important}\nhtml .as-index tbody tr{padding:14px 0!important;border-bottom:1px solid rgba(255,255,255,.12)}\nhtml .as-index td{padding:0!important;white-space:normal!important}\nhtml .as-index td:nth-child(1){font-size:12px!important;opacity:.55;margin-bottom:4px}\nhtml .as-index td:nth-child(3){margin:4px 0}\nhtml .as-index td:nth-child(4){font-size:12px!important;opacity:.55}\nhtml .as-index tr.as-yr{border-bottom:0}\nhtml .as-index tr.as-yr td{font-weight:700;opacity:1;font-size:inherit!important;padding-top:24px!important}\nhtml .as-scroll{overflow-x:auto!important;padding:24px 16px 8px!important}\nhtml .as-scroll>column-set{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:flex-end!important;gap:16px!important;width:max-content!important;min-width:0!important}\nhtml .as-scroll{scroll-snap-type:x mandatory;overscroll-behavior-x:contain}\nhtml .as-scroll column-unit{flex:none!important;width:76vw!important;max-width:76vw!important;margin:0!important;scroll-snap-align:start}\nhtml .as-scroll column-unit[span='4']{width:76vw!important;max-width:76vw!important}\nhtml .as-dots{display:flex!important}\nhtml .as-row .as-cap{min-height:2.8em!important}\nhtml .as-index td.as-none{display:none!important}\nhtml body .asc .asc-h::before{content:'\\2192';font-family:'DM Sans',Arial,sans-serif;font-size:.55em;color:rgba(242,242,242,.55);margin-right:.45em;position:relative;top:-.18em}";document.head.appendChild(nst);}
+if(!nst||!nst.isConnected){nst=document.createElement('style');nst.dataset.ascN='1';nst.textContent=".asc.asc{grid-template-columns:minmax(0,1fr);row-gap:40px;margin-top:40px}\n.asc .asc-cards{padding:0;display:grid;grid-template-columns:minmax(0,1fr)!important;gap:36px}\n.asc .asc-title{grid-column:1/-1;font-size:36px!important}\nhtml .aal .aal-top{padding-top:24px!important}\nhtml .aal .aal-ag{position:absolute!important;top:0;transform:translateX(-50%)!important;display:block;margin:0;font-size:9.5px!important;letter-spacing:.03em!important}\nhtml .aal .aal-line{display:block!important}\nhtml .aal .aal-ag:first-child{transform:translateX(-40%)!important}\nhtml .aal-label,html .as-index-toggle{font-size:32px!important}\nhtml .asc .asc-card{width:auto!important;max-width:none!important;grid-column:1/-1!important}\nhtml .ab-open{top:18px!important;right:16px!important;font-size:20px!important}\nhtml .ab-sheet{display:block!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch;width:100vw!important}\nhtml .ab-photos{width:100%!important;border-right:0!important}\nhtml .ab-strip img{height:320px}\nhtml .ab-text{display:block!important;overflow:visible!important;padding:28px 20px 48px!important}\nhtml .as-index thead{display:none!important}\nhtml .as-index table,html .as-index tbody,html .as-index tr,html .as-index td{display:block!important;width:auto!important}\nhtml .as-index tbody tr{padding:14px 0!important;border-bottom:1px solid rgba(255,255,255,.12)}\nhtml .as-index td{padding:0!important;white-space:normal!important}\nhtml .as-index td:nth-child(1){font-size:12px!important;opacity:.55;margin-bottom:4px}\nhtml .as-index td:nth-child(3){margin:4px 0}\nhtml .as-index td:nth-child(4){font-size:12px!important;opacity:.55}\nhtml .as-index tr.as-yr{border-bottom:0}\nhtml .as-index tr.as-yr td{font-weight:700;opacity:1;font-size:inherit!important;padding-top:24px!important}\nhtml .as-scroll{overflow-x:auto!important;padding:24px 16px 8px!important}\nhtml .as-scroll>column-set{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:flex-end!important;gap:16px!important;width:auto!important;min-width:0!important}\nhtml .as-scroll column-unit{flex:none!important;width:76vw!important;max-width:76vw!important;margin:0!important}\nhtml .as-scroll column-unit[span='4']{width:76vw!important;max-width:76vw!important}\nhtml .as-row .as-cap{min-height:2.8em!important}\nhtml .as-index td.as-none{display:none!important}\nhtml body .asc .asc-h::before{content:'\\2192';font-family:'DM Sans',Arial,sans-serif;font-size:.55em;color:rgba(242,242,242,.55);margin-right:.45em;position:relative;top:-.18em}";document.head.appendChild(nst);}
   
 if(!tst||!tst.isConnected){tst=document.createElement('style');tst.dataset.ascT='1';tst.textContent='.asc .asc-cards{grid-template-columns:minmax(0,1fr)}';document.head.appendChild(tst);}
   
@@ -1023,6 +1023,7 @@ document.addEventListener('click',function(e){var d=e.target.closest&&e.target.c
 deco(); new MutationObserver(window.__asT(deco)).observe(document.documentElement,{childList:true,subtree:true});
 })();
  
+/* v67c: no scroll snapping on the phone row (Safari can keep re-snapping while Cargo resizes slideshows); the row keeps Cargo's own width, as in v66 */
 /* v66: on narrow phones (under 420px) "Creative strategy" and "Alice Smith" shrink a little so they don't overlap. v67: iPhones no longer enlarge some text on their own (that made the index lines different sizes) */
 (function(){ var st=document.createElement('style'); st.setAttribute('data-as-narrow','1'); st.textContent='html{-webkit-text-size-adjust:100%;text-size-adjust:100%}@media (max-width:420px){html body .asc .asc-title.asc-title{font-size:min(20px,4.4vw)!important}html body .ab-open.ab-open{font-size:min(20px,4.4vw)!important}}'; document.head.appendChild(st); })();
 /* v60: one left and right edge for the whole page, taken from "Creative strategy" and "Alice Smith" */
@@ -1046,26 +1047,24 @@ st.textContent=
 }
 edge(); window.addEventListener('resize',window.__asT(edge)); new MutationObserver(window.__asT(edge)).observe(document.documentElement,{childList:true,subtree:true});
 })();
-/* v67: phones show the projects as a sideways row; dots under it show where you are and jump to a project */
+/* v67c: phones show the projects as a sideways row. The dots under it are drawn by CSS only (nothing is added inside Cargo's page,
+   because Cargo redraws whenever something it did not make appears there). 6 dots = 6 projects; change N_DOTS if projects are added or removed */
 (function(){
+var N_DOTS=6, STEP=17, R=3;
+var layers=[], pos=[]; for(var k=0;k<N_DOTS;k++){ layers.push('radial-gradient(circle,rgba(242,242,242,.3) '+R+'px,transparent '+(R+0.6)+'px)'); pos.push('calc(50% + '+((k-(N_DOTS-1)/2)*STEP)+'px) 50%'); }
+var first='calc(50% + '+(-(N_DOTS-1)/2*STEP)+'px + var(--as-dot,0) * '+STEP+'px) 50%';
 var st=document.createElement('style'); st.setAttribute('data-as-dots','1');
-st.textContent='.as-dots{display:none;justify-content:center;gap:10px;padding:14px 0 4px}.as-dots button{width:7px;height:7px;padding:0;border:0;border-radius:50%;background:rgba(242,242,242,.3);cursor:pointer}.as-dots button.on{background:#f2f2f2}';
+st.textContent='@media (max-width:760px){html .as-scroll::after{content:"";display:block;position:sticky;left:16px;width:calc(100vw - 32px);height:8px;margin-top:14px;'+
+'background-image:radial-gradient(circle,#f2f2f2 '+R+'px,transparent '+(R+0.6)+'px),'+layers.join(',')+';background-size:8px 8px;background-repeat:no-repeat;background-position:'+first+','+pos.join(',')+'}}';
 document.head.appendChild(st);
-function units(sc){ return sc?[].slice.call(sc.querySelectorAll('column-set > column-unit')):[]; }
-function cur(sc,u){ var l=sc.getBoundingClientRect().left, b=0, bd=1e9; u.forEach(function(x,i){ var d=Math.abs(x.getBoundingClientRect().left-l-(parseFloat(getComputedStyle(sc).paddingLeft)||0)); if(d<bd){bd=d;b=i;} }); return b; }
-function mark(){ var sc=document.querySelector('.as-scroll'), d=document.querySelector('.as-dots'); if(!sc||!d) return; var u=units(sc), i=cur(sc,u); [].forEach.call(d.children,function(b,k){ b.className=k===i?'on':''; }); }
-function build(){ var sc=document.querySelector('.as-scroll'); if(!sc) return; var u=units(sc); if(!u.length) return;
-var d=sc.parentNode.querySelector(':scope > .as-dots');
-if(!d||d.children.length!==u.length){ if(d) d.remove(); d=document.createElement('div'); d.className='as-dots'; d.setAttribute('aria-label','Projects');
-u.forEach(function(x,k){ var b=document.createElement('button'); b.type='button'; b.setAttribute('aria-label','Project '+(k+1)); b.addEventListener('click',function(){ var su=units(sc); if(su[k]) sc.scrollTo({left:su[k].offsetLeft-(parseFloat(getComputedStyle(sc).paddingLeft)||0),behavior:'smooth'}); }); d.appendChild(b); });
-sc.parentNode.insertBefore(d,sc.nextSibling); }
-if(!sc.__asDots){ sc.__asDots=1; sc.addEventListener('scroll',window.__asT(mark),{passive:true}); }
-mark(); }
-build(); new MutationObserver(window.__asT(build)).observe(document.documentElement,{childList:true,subtree:true});
+var bound=null;
+function mark(){ var sc=document.querySelector('.as-scroll'); if(!sc) return; var u=sc.querySelectorAll('column-set > column-unit'); if(!u.length) return;
+var l=sc.getBoundingClientRect().left+(parseFloat(getComputedStyle(sc).paddingLeft)||0), b=0, bd=1e9;
+for(var i=0;i<u.length;i++){ var d=Math.abs(u[i].getBoundingClientRect().left-l); if(d<bd){bd=d;b=i;} }
+var v=String(Math.min(b,N_DOTS-1)); if(document.documentElement.style.getPropertyValue('--as-dot')!==v) document.documentElement.style.setProperty('--as-dot',v); }
+function bind(){ var sc=document.querySelector('.as-scroll'); if(sc&&sc!==bound){ bound=sc; sc.addEventListener('scroll',window.__asT(mark),{passive:true}); mark(); } }
+bind(); setInterval(bind,1000);
 })();
-/* v67: index cells that only say "/" (no client) are marked, so phones can leave that line out */
-(function(){ function mk(){ [].forEach.call(document.querySelectorAll('.as-index td'),function(td){ var n=td.textContent.trim()==='/'; if(n!==td.classList.contains('as-none')) td.classList.toggle('as-none',n); }); }
-mk(); new MutationObserver(window.__asT(mk)).observe(document.documentElement,{childList:true,subtree:true}); })();
 /* v60: drag the project row sideways with the mouse (hand cursor) */
 (function(){
 if(!document.querySelector('style[data-as-drag]')){var s=document.createElement('style'); s.setAttribute('data-as-drag','1');

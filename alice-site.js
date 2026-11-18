@@ -1,8 +1,13 @@
+/* v61: the page stays hidden (set by the page code) until this file has laid it out and the fonts are in, so nothing jumps; the 3D starts right after */
+window.__asWhenShown=window.__asShown?function(f){setTimeout(f,0);}:function(f){(window.__asQ=window.__asQ||[]).push(f);};
 window.__asT=function(fn){var b=false;return function(){if(b)return;b=true;setTimeout(function(){b=false;try{fn();}catch(e){}},200);};};
 /* v60 settings ------------------------------------------------------------
    HEADLINE FONT: to change it, edit HF (the CSS font list) and HF_FACES (the font files). */
 (function(){
-var BASE='https://cdn.jsdelivr.net/gh/alsmthstudio2/chess-pieces@main/fonts/';
+/* v61: fonts and photos come from the same pinned version as this file, so browsers keep them cached */
+var ME=(document.currentScript&&document.currentScript.src)||'';
+var BASE=/alice-site\.js/.test(ME)?ME.replace(/alice-site\.js.*$/,'fonts/'):'https://cdn.jsdelivr.net/gh/alsmthstudio2/chess-pieces@main/fonts/';
+window.__asBase=BASE;
 var HF='"Garamondt",Georgia,serif';
 var HF_FACES=[['Garamondt','Garamondt-Regular.woff2','normal'],['Garamondt','Garamondt-Italic.woff2','italic']];
 /* BODY FONT: edit BF and BF_FACES (font, file, style, weight) */
@@ -27,7 +32,7 @@ var st=document.createElement('style'); st.setAttribute('data-as-hf','1'); st.te
 var pl=document.createElement('link'); pl.rel='preload'; pl.as='font'; pl.type='font/woff2'; pl.crossOrigin='anonymous'; pl.href=BASE+HF_FACES[0][1]; document.head.appendChild(pl);
 }
 /* v60h: photos are web-sized copies in this repo. The table photo starts loading first; the About photos load when the page is idle, so About opens instantly */
-var IMG=BASE.replace('/fonts/','/img/');
+var IMG=BASE.replace('/fonts/','/img/'); window.__asImg=IMG;
 (new Image()).src=IMG+'table.jpg';
 window.addEventListener('load',function(){ setTimeout(function(){ ['about-1-137.jpg','about-2.jpg'].forEach(function(f){ var i=new Image(); i.decoding='async'; i.src=IMG+f; }); },1500); });
 /* three.js starts downloading now, alongside the chess data, instead of after it */
@@ -128,7 +133,7 @@ window.__ascZ={m:{"f_king":{"s":5.371257638670787e-05,"h":1.76,"i32":false,"p":1
 ].join('')};
 /* the section's styling travels with the script, so it works even where Cargo leaves out the page CSS */
 function addStyle8(){const st=document.createElement('style');st.dataset.asc8='1';st.textContent="/* v8: photo full width as the opening screen, header over it, services in a row below */\nhtml .asc.asc{display:block!important;max-width:none!important;margin-bottom:60px!important;column-gap:0!important}\nhtml .asc .asc-stage{position:relative;aspect-ratio:16/10!important;width:100%!important;max-width:none!important;background-size:100% auto!important;background-position:center 33%!important;background-repeat:no-repeat!important}\nhtml .asc .asc-stage::before{content:\"\";position:absolute;left:0;right:0;top:0;height:180px;background:linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,0));pointer-events:none}\nhtml .asc .asc-cards{position:static!important}\nhtml .asc .asc-title{position:absolute!important;top:34px;left:40px;margin:0!important;z-index:6;font-size:34px!important;line-height:1!important;letter-spacing:.01em}\nhtml .asc::after{content:none;position:absolute;top:34px;right:40px;z-index:6;font-family:var(--as-hf);font-size:34px;line-height:1;text-transform:uppercase;letter-spacing:.01em;color:#f2f2f2}\n";document.head.appendChild(st);}
-function addStyle(){const st=document.createElement('style');st.dataset.asc='1';st.textContent="/* Creative strategy section (chess) */\n.asc{--asc-ink:#0d0d0d;--asc-soft:rgba(13,13,13,.55);--asc-head:\"JetBrains Mono\",ui-monospace,Menlo,monospace;--asc-text:var(--as-bf);position:relative;display:grid;grid-template-columns:minmax(0,3.2fr) minmax(0,1.1fr);column-gap:clamp(24px,5vw,90px);max-width:1500px;margin:80px auto 40px;color:var(--asc-ink)}\n.asc-stage{position:relative;aspect-ratio:4/3;max-width:100%;background:url(https://cdn.jsdelivr.net/gh/alsmthstudio2/chess-pieces@main/img/table.jpg) center/cover no-repeat}\n.asc-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;margin:0;max-width:none}\n.asc-gl,.asc-lines{position:absolute;left:0;top:-80px;width:100%;height:calc(100% + 120px);pointer-events:none}\n.asc-gl{z-index:2}\n.asc-lines{z-index:1;overflow:visible}\n.asc-lines path{fill:none;stroke:var(--asc-ink);stroke-width:1}\n.asc-lines path.head{display:none}\n.asc-lines .ring,.asc-lines .dot{fill:var(--asc-ink);stroke:none}\n.asc-cards{position:relative;z-index:4;display:flex;flex-direction:column;justify-content:space-between;padding:4% 0 8%;gap:28px;min-width:0;font-family:var(--asc-text);font-size:13.5px;line-height:1.4}\n.asc-title{font-family:var(--asc-head);font-weight:700;font-size:20px;line-height:1.2;margin:0 0 8px}\n.asc-card{display:grid;gap:12px;max-width:34ch;outline:none}\n.asc-h{font-family:var(--asc-head);font-weight:700;font-size:15px;line-height:1.3}\n.asc-who{color:var(--asc-soft)}\n.asc-piece{display:none}\n@media (max-width:760px){\n  .asc{grid-template-columns:minmax(0,1fr);row-gap:40px;margin-top:40px}\n  .asc-lines{display:none}\n  .asc-cards{padding:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px 20px}\n  .asc-title{grid-column:1/-1}\n}\n@media (max-width:420px){ .asc-cards{grid-template-columns:minmax(0,1fr)} }\n\n/* dark theme + type (option 1) */\nhtml,body,.page,.page-layout,.page-content,.content{background-color:#0d0d0d!important}\nbody,bodycopy,.page-content{color:#f2f2f2!important}\n.asc{--asc-ink:#f2f2f2!important;--asc-soft:rgba(242,242,242,.55)!important;--asc-head:var(--as-hf)!important;--asc-text:var(--as-bf)!important;color:#f2f2f2!important}\n.asc-title{font-weight:400!important;font-size:52px!important;line-height:1!important;text-transform:uppercase}\n.asc-h{font-weight:500!important;font-size:26px!important;line-height:1.05!important}\n.asc-cards{font-size:12.5px!important}\n.aal{color:#f2f2f2!important}\n.aal-line,.aal-line::before,.aal-line::after,.aal-dot{background:#f2f2f2!important}\n.aal-items{display:none!important}\n.aal-label,.as-index-toggle{font-family:var(--as-hf)!important;font-weight:400!important;font-size:44px!important;letter-spacing:0!important;line-height:1!important;color:#f2f2f2!important}\n.aal-ag,.aal-end{font-family:var(--as-bf)!important;font-weight:400!important;font-size:11px!important;text-transform:uppercase;letter-spacing:.06em}\n.as-wk .as-cap,.as-facts .as-mono,.as-facts .as-blurb,.as-body .as-team{color:rgba(242,242,242,.55)!important}\n.as-wk:hover .as-cap,.as-wk.as-on .as-cap{color:#f2f2f2!important}\n.as-wk.as-on .as-img,.as-wk:focus-visible{outline-color:#f2f2f2!important}\n.as-detail{border-top-color:rgba(242,242,242,.2)!important}\n@media (max-width:760px){.aal-label,.as-index-toggle{font-size:32px!important}}\n";document.head.appendChild(st);}
+function addStyle(){const st=document.createElement('style');st.dataset.asc='1';st.textContent="/* Creative strategy section (chess) */\n.asc{--asc-ink:#0d0d0d;--asc-soft:rgba(13,13,13,.55);--asc-head:\"JetBrains Mono\",ui-monospace,Menlo,monospace;--asc-text:var(--as-bf);position:relative;display:grid;grid-template-columns:minmax(0,3.2fr) minmax(0,1.1fr);column-gap:clamp(24px,5vw,90px);max-width:1500px;margin:80px auto 40px;color:var(--asc-ink)}\n.asc-stage{position:relative;aspect-ratio:4/3;max-width:100%;background:url("+window.__asImg+"table.jpg) center/cover no-repeat}\n.asc-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;margin:0;max-width:none}\n.asc-gl,.asc-lines{position:absolute;left:0;top:-80px;width:100%;height:calc(100% + 120px);pointer-events:none}\n.asc-gl{z-index:2}\n.asc-lines{z-index:1;overflow:visible}\n.asc-lines path{fill:none;stroke:var(--asc-ink);stroke-width:1}\n.asc-lines path.head{display:none}\n.asc-lines .ring,.asc-lines .dot{fill:var(--asc-ink);stroke:none}\n.asc-cards{position:relative;z-index:4;display:flex;flex-direction:column;justify-content:space-between;padding:4% 0 8%;gap:28px;min-width:0;font-family:var(--asc-text);font-size:13.5px;line-height:1.4}\n.asc-title{font-family:var(--asc-head);font-weight:700;font-size:20px;line-height:1.2;margin:0 0 8px}\n.asc-card{display:grid;gap:12px;max-width:34ch;outline:none}\n.asc-h{font-family:var(--asc-head);font-weight:700;font-size:15px;line-height:1.3}\n.asc-who{color:var(--asc-soft)}\n.asc-piece{display:none}\n@media (max-width:760px){\n  .asc{grid-template-columns:minmax(0,1fr);row-gap:40px;margin-top:40px}\n  .asc-lines{display:none}\n  .asc-cards{padding:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px 20px}\n  .asc-title{grid-column:1/-1}\n}\n@media (max-width:420px){ .asc-cards{grid-template-columns:minmax(0,1fr)} }\n\n/* dark theme + type (option 1) */\nhtml,body,.page,.page-layout,.page-content,.content{background-color:#0d0d0d!important}\nbody,bodycopy,.page-content{color:#f2f2f2!important}\n.asc{--asc-ink:#f2f2f2!important;--asc-soft:rgba(242,242,242,.55)!important;--asc-head:var(--as-hf)!important;--asc-text:var(--as-bf)!important;color:#f2f2f2!important}\n.asc-title{font-weight:400!important;font-size:52px!important;line-height:1!important;text-transform:uppercase}\n.asc-h{font-weight:500!important;font-size:26px!important;line-height:1.05!important}\n.asc-cards{font-size:12.5px!important}\n.aal{color:#f2f2f2!important}\n.aal-line,.aal-line::before,.aal-line::after,.aal-dot{background:#f2f2f2!important}\n.aal-items{display:none!important}\n.aal-label,.as-index-toggle{font-family:var(--as-hf)!important;font-weight:400!important;font-size:44px!important;letter-spacing:0!important;line-height:1!important;color:#f2f2f2!important}\n.aal-ag,.aal-end{font-family:var(--as-bf)!important;font-weight:400!important;font-size:11px!important;text-transform:uppercase;letter-spacing:.06em}\n.as-wk .as-cap,.as-facts .as-mono,.as-facts .as-blurb,.as-body .as-team{color:rgba(242,242,242,.55)!important}\n.as-wk:hover .as-cap,.as-wk.as-on .as-cap{color:#f2f2f2!important}\n.as-wk.as-on .as-img,.as-wk:focus-visible{outline-color:#f2f2f2!important}\n.as-detail{border-top-color:rgba(242,242,242,.2)!important}\n@media (max-width:760px){.aal-label,.as-index-toggle{font-size:32px!important}}\n";document.head.appendChild(st);}
 addStyle();addStyle8();
 /* phone layout follows the section's own width (Cargo's phone preview is not a narrow window, so media queries miss it) */
 let nst=null,tst=null,wasN=null,wst8=null,nst8=null;
@@ -233,7 +238,7 @@ panel(8,5,-6,9,4,1.4); panel(4,8,8,6,-2,0.6); panel(4,4,0,12,-6,0.8);
   
 const pm=new T.PMREMGenerator(renderer);
   
-scene.environment=pm.fromScene(env,0.04).texture;
+scene.environment=pm.fromScene(env,0).texture;   // v61: extra blur 0.04 -> 0: same look (checked pixel by pixel), about 3x faster to set up
 })();
 scene.add(new T.HemisphereLight(0xffffff,0x888888,0.35));
 const sun=new T.DirectionalLight(0xffffff,1.25);
@@ -543,7 +548,10 @@ let o=hit.object;while(o&&!holders.includes(o))o=o.parent; if(o){o.userData.vel=
 },{passive:true});
 function flip(h){}
 /* v60: idle spin. SPIN = radians per second (0.1 = one turn in about a minute); SPIN_MS = ms between frames while only idling (66 = 15 fps) */
-const SPIN=0.1, SPIN_MS=66, SPIN_HOVER=0.3;   // SPIN_HOVER: speed while the mouse is on a piece or its card (was 0.5)
+const SPIN=0.1, SPIN_MS=66, SPIN_HOVER=0.3;
+/* v61: if this device draws the 3D slowly (software graphics, weak phones), the idle spin turns off so the page never freezes; hover still turns the pieces */
+let SPINV=SPIN, rN=0, rT=0;
+{try{const gl=renderer.getContext(),ex=gl.getExtension('WEBGL_debug_renderer_info'),nm=ex?String(gl.getParameter(ex.UNMASKED_RENDERER_WEBGL)):''; if(/swiftshader|llvmpipe|software|softpipe/i.test(nm))SPINV=0;}catch(e){}}   // SPIN_HOVER: speed while the mouse is on a piece or its card (was 0.5)
 function frame(){
   
 refresh(); if(!place()){requestAnimationFrame(frame);return;}
@@ -571,7 +579,7 @@ eul.set(p.tx, 0, p.tz); h.quaternion.copy(camera.quaternion).multiply(qt.setFrom
     
 const on=hoverId===p.id;
     
-u.vel+=(((on&&!reduce)?SPIN_HOVER:(reduce?0:SPIN))-u.vel)*Math.min(1,dt*1.5);
+u.vel+=(((on&&!reduce)?SPIN_HOVER:(reduce?0:SPINV))-u.vel)*Math.min(1,dt*1.5);
     
 u.ang+=u.vel*dt;
     
@@ -583,18 +591,20 @@ h.scale.setScalar(scale*p.sz);
   
 });
   
-const nowMs=Date.now(), busy=holders.some(h=>Math.abs(h.userData.vel-(reduce?0:SPIN))>1e-3||Math.abs(h.userData.hover-(hoverId===h.userData.p.id?1:0))>1e-3), mv=busy||(SPIN>0&&!reduce&&nowMs-(window.__ascLast||0)>=SPIN_MS), sig=lastKey+'|'+scale;
-if(mv||sig!==window.__ascSig||nowMs-(window.__ascLast||0)>1000){window.__ascSig=sig; window.__ascLast=nowMs;
+const nowMs=Date.now(), busy=holders.some(h=>Math.abs(h.userData.vel-(reduce?0:SPINV))>1e-3||Math.abs(h.userData.hover-(hoverId===h.userData.p.id?1:0))>1e-3), mv=busy||(SPINV>0&&!reduce&&nowMs-(window.__ascLast||0)>=SPIN_MS), sig=lastKey+'|'+scale;
+if(mv||sig!==window.__ascSig||nowMs-(window.__ascLast||0)>(SPINV?1000:8000)){window.__ascSig=sig; window.__ascLast=nowMs;
+const t0=performance.now();
 updateDrops();
 renderer.render(scene,camera);
-drawLines();}
+drawLines();
+if(SPINV&&rN<12){const d=performance.now()-t0; if(rN>=2)rT+=d; rN++; if(rN===12&&rT/10>28){SPINV=0; holders.forEach(h=>{if(hoverId!==h.userData.p.id)h.userData.vel=0;});}}}
 requestAnimationFrame(frame);
 }
 setFinish('satin');
 [solidM,dashM,headM].forEach(m=>m.opacity=0.45);   // faint table lines
 frame();
 }
-function boot(){if(window.THREE){start();return;} const s=window.__asThree(); s.addEventListener('load',function(){start();},{once:true});}
+function boot(){if(!window.__asShown){window.__asWhenShown(boot);return;} if(window.THREE){start();return;} const s=window.__asThree(); s.addEventListener('load',function(){start();},{once:true});}
 /* v31: chess piece data is stored compressed (same pieces, smaller page code); unpack it, then start */
 if(window.__ascPieces||!window.__ascZ)boot(); else {const Z=window.__ascZ,bin=atob(Z.d),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
 new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer().then(function(buf){const P={};let o=0;Object.keys(Z.m).forEach(function(k){const m=Z.m[k],e={s:m.s,h:m.h,i32:m.i32};['p','n','i'].forEach(function(f){e[f]=new Uint8Array(buf,o,m[f]);o+=m[f];});P[k]=e;});window.__ascPieces=P;boot();});}
@@ -610,9 +620,9 @@ var LINKEDIN='https://www.linkedin.com/in/alice-smith-/';
   
 var IG='https://www.instagram.com/aesmth/';
   
-var PHOTO1='https://cdn.jsdelivr.net/gh/alsmthstudio2/chess-pieces@main/img/about-1-137.jpg';
+var PHOTO1=window.__asImg+'about-1-137.jpg';
   
-var PHOTO2='https://cdn.jsdelivr.net/gh/alsmthstudio2/chess-pieces@main/img/about-2.jpg';
+var PHOTO2=window.__asImg+'about-2.jpg';
   
 var X='\x3csvg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">\x3cpath d="M2 2L20 20M20 2L2 20" stroke="#fff" stroke-width="1.2" fill="none"/>\x3c/svg>';
   
@@ -1114,4 +1124,17 @@ function up(e){ if(!sc||(e&&e.pointerId!==id)) return; var m=moved; sc=null; id=
 if(m){ var stop=function(ev){ ev.preventDefault(); ev.stopPropagation(); ev.stopImmediatePropagation(); }; window.addEventListener('click',stop,{capture:true,once:true}); setTimeout(function(){ window.removeEventListener('click',stop,true); },0); } }
 document.addEventListener('pointerup',up,true); document.addEventListener('pointercancel',up,true);
 document.addEventListener('dragstart',function(e){ if(e.target.closest&&e.target.closest('.as-scroll')) e.preventDefault(); },true);
+})();
+
+/* v61: show the page once it is laid out and the fonts are in (at most 1.5 s), then start the 3D */
+(function(){
+var t0=Date.now(), fontsIn=false;
+try{ Promise.all(['400 16px "DM Sans"','400 20px "Garamondt"'].map(function(f){return document.fonts.load(f);})).then(function(){fontsIn=true;},function(){fontsIn=true;}); }catch(e){ fontsIn=true; }
+function show(){
+if(window.__asShown) return; window.__asShown=1;
+document.documentElement.classList.remove('as-wait');
+window.__asWhenShown=function(f){setTimeout(f,0);};
+requestAnimationFrame(function(){ setTimeout(function(){ (window.__asQ||[]).splice(0).forEach(function(f){ try{f();}catch(e){} }); },80); });
+}
+(function wait(){ if(window.__asShown) return; if(fontsIn||Date.now()-t0>1500){ requestAnimationFrame(show); return; } setTimeout(wait,30); })();
 })();

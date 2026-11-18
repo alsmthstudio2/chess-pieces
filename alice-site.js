@@ -1041,18 +1041,18 @@ if(f.getAttribute('data-s')!=='1'){ f.style.cssText='font-family:Inter,"Helvetic
 if(f.previousElementSibling!==x) x.parentNode.insertBefore(f,x.nextSibling); }
 ft(); new MutationObserver(window.__asT(ft)).observe(document.documentElement,{childList:true,subtree:true});
 })();
-/* v47: Disintegrator slideshow: picture 5s, then the whole video, then repeat */
+/* v47: Disintegrator slideshow: picture 10s (v64, was 5s), then the whole video, then repeat */
 (function(){
 var IMG=(window.__asImg||'https://cdn.jsdelivr.net/gh/alsmthstudio2/chess-pieces@main/img/')+'disintegrator-800.jpg';   // v62: 800px JPG (was the 3.4 MB PNG); otherwise unchanged from v60
-var VID='https://freight.cargo.site/t/original/i/C3225768213212814699940347946568/2.mp4';
-var PIC_MS=5000, t=null, box=null, im=null, vd=null;
+var VID='https://freight.cargo.site/t/original/i/K3236735339438673898209750328904/disintegrator2.mp4';   // v64: copy in the alicesmith.xyz library
+var PIC_MS=10000, t=null, box=null, im=null, vd=null;
 function show(which){
 if(!box) return; clearTimeout(t);
 im.style.opacity=which==='img'?'1':'0'; vd.style.opacity=which==='vid'?'1':'0';
 if(which==='img'){ try{vd.pause();}catch(e){} t=setTimeout(function(){show('vid');},PIC_MS); return; }
 try{vd.currentTime=0;}catch(e){}
 var p=vd.play(); if(p&&p.catch) p.catch(function(){});
-t=setTimeout(function(){ show('img'); },15000);
+t=setTimeout(function(){ show('img'); },(vd.duration>0&&isFinite(vd.duration))?vd.duration*1000+1500:15000);
 }
 function build(){
 var wk=document.querySelector('.as-wk[data-id="p-disintegrator"]'); if(!wk) return;

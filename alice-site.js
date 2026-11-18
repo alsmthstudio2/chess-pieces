@@ -1153,3 +1153,8 @@ function go(f){ var u=f.getAttribute('data-src'); if(u&&f.getAttribute('src')!==
 function scan(){ [].forEach.call(document.querySelectorAll('iframe[data-src]'),function(f){ if(f.getAttribute('src')===f.getAttribute('data-src')) return; if(f.__asObs) return; f.__asObs=1; if(io) io.observe(f); else go(f); }); }
 scan(); new MutationObserver(window.__asT(scan)).observe(document.documentElement,{childList:true,subtree:true});
 })();
+/* v61f: page language and main region, for screen readers and search engines */
+(function(){
+function a11y(){ var d=document.documentElement; if(!d.getAttribute('lang')) d.setAttribute('lang','en'); var b=document.querySelector('bodycopy'); if(b&&!b.getAttribute('role')) b.setAttribute('role','main'); }
+a11y(); new MutationObserver(window.__asT(a11y)).observe(document.documentElement,{childList:true,subtree:true});
+})();

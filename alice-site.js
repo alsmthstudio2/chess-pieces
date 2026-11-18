@@ -36,7 +36,9 @@ var IMG=BASE.replace('/fonts/','/img/'); window.__asImg=IMG;
 /* v61d: phones get a 1200px table photo (sharp at phone size, 30% smaller); 3D library downloads after the photo, so the photo shows first */
 window.__asTable=Math.min(window.innerWidth||9999,(window.screen&&screen.width)||9999)<760?'table-1200.jpg':'table.jpg';
 var tp=new Image(); tp.onload=tp.onerror=function(){ if(!window.THREE) window.__asThree(); }; tp.src=IMG+window.__asTable; setTimeout(function(){ if(!window.THREE) window.__asThree(); },2500);
-window.addEventListener('load',function(){ setTimeout(function(){ ['about-1-137.jpg','about-2.jpg'].forEach(function(f){ var i=new Image(); i.decoding='async'; i.src=IMG+f; }); },1500); });
+window.__abLoad=function(){ var a=document.querySelectorAll('.ab-sheet img[data-ab-src]'); if(!a.length){ ['about-1-137.jpg','about-2.jpg'].forEach(function(f){ var i=new Image(); i.decoding='async'; i.src=IMG+f; }); return; } for(var k=0;k<a.length;k++){ if(!a[k].getAttribute('src')) a[k].setAttribute('src',a[k].getAttribute('data-ab-src')); } };
+/* v65: About photos download only when someone heads for the About button (hover, touch or keyboard), not on every visit */
+(function(){ var done=0; function pre(e){ if(done) return; var t=e&&e.target; if(!t||!t.closest||!t.closest('.ab-open')) return; done=1; window.__abLoad(); } ['pointerover','touchstart','focusin'].forEach(function(n){ document.addEventListener(n,pre,{passive:true,capture:true}); }); })();
 /* three.js starts downloading now, alongside the chess data, instead of after it */
 window.__asThree=function(){var s=document.querySelector('script[data-three]'); if(s) return s;
 s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'; s.async=true; s.setAttribute('data-three','1');
@@ -639,9 +641,9 @@ s.innerHTML=
       
 '\x3cdiv class="ab-photos">\x3cdiv class="ab-strip">'+
         
-'\x3cfigure>\x3cimg src="'+PHOTO1+'" alt="">\x3cfigcaption>Wearing Spiritual Technologies 2026 | \x3cspan>© Joe Westley\x3c/span>\x3c/figcaption>\x3c/figure>'+
+'\x3cfigure>\x3cimg data-ab-src="'+PHOTO1+'" alt="">\x3cfigcaption>Wearing Spiritual Technologies 2026 | \x3cspan>© Joe Westley\x3c/span>\x3c/figcaption>\x3c/figure>'+
         
-'\x3cfigure>\x3cimg src="'+PHOTO2+'" alt="">\x3cfigcaption>co\u2014matter 2024 | \x3cspan>© Camille Blake\x3c/span>\x3c/figcaption>\x3c/figure>'+
+'\x3cfigure>\x3cimg data-ab-src="'+PHOTO2+'" alt="">\x3cfigcaption>co\u2014matter 2024 | \x3cspan>© Camille Blake\x3c/span>\x3c/figcaption>\x3c/figure>'+
       
 '\x3c/div>\x3c/div>'+
       
@@ -783,7 +785,7 @@ s.querySelector('.ab-x').addEventListener('click',close);
   
 }
   
-function open(){ build(); document.documentElement.classList.add('ab-on'); var sh=document.querySelector('.ab-sheet'); if(sh&&sh.fit) setTimeout(sh.fit,50); }
+function open(){ build(); window.__abLoad(); document.documentElement.classList.add('ab-on'); var sh=document.querySelector('.ab-sheet'); if(sh&&sh.fit) setTimeout(sh.fit,50); }
   
 function close(){ document.documentElement.classList.remove('ab-on'); var sh=document.querySelector('.ab-sheet'); if(sh&&sh.isBig&&sh.isBig()) setTimeout(function(){ sh.setBig(false); },460); }
   
@@ -1044,7 +1046,7 @@ ft(); new MutationObserver(window.__asT(ft)).observe(document.documentElement,{c
 /* v47: Disintegrator slideshow: picture 10s (v64, was 5s), then the whole video, then repeat */
 (function(){
 var IMG=(window.__asImg||'https://cdn.jsdelivr.net/gh/alsmthstudio2/chess-pieces@main/img/')+'disintegrator-800.jpg';   // v62: 800px JPG (was the 3.4 MB PNG); otherwise unchanged from v60
-var VID='https://freight.cargo.site/t/original/i/K3236735339438673898209750328904/disintegrator2.mp4';   // v64: copy in the alicesmith.xyz library
+var VID='https://freight.cargo.site/t/original/i/X3236772765742577142339671205448/disintegrator2-800.mp4';   // v65: 800px copy, 0.8 MB (was 7.4 MB)
 var PIC_MS=10000, t=null, box=null, im=null, vd=null;
 function show(which){
 if(!box) return; clearTimeout(t);

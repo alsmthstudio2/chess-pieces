@@ -1094,6 +1094,31 @@ var target=Math.max(0,Math.min(sc.scrollWidth-sc.clientWidth,l0-dx)); if(Math.ab
 window.addEventListener('touchend',function(){ if(!sc) return; var el=sc; sc=null; if(!forced||dir!==1) return; var vel=v*16;
 (function glide(){ vel*=0.92; if(Math.abs(vel)<0.5) return; el.scrollLeft-=vel; raf=requestAnimationFrame(glide); })(); },{capture:true,passive:true});
 })();
+/* v68d: phone project row, three safety nets.
+   1. a see-through layer over each project picture, so touches land on the project (which opens it) and never on Cargo's slideshow
+   2. the row is held to exactly the screen width, so it always has something to scroll
+   3. if the row still cannot scroll, the projects stack one under another (the v66 phone layout) so nothing is out of reach */
+(function(){
+if(window.__asOff.row) return;
+var st=document.createElement('style'); st.setAttribute('data-as-row3','1');
+st.textContent='@media (max-width:760px){html .as-wk{position:relative!important}html .as-wk:not(:has(iframe))::after{content:"";position:absolute;left:0;top:0;right:0;bottom:0;z-index:20;background:transparent}'+
+'html .as-scroll{box-sizing:border-box!important;-webkit-overflow-scrolling:touch}'+
+'html.as-stack .as-scroll>column-set{flex-direction:column!important;align-items:flex-start!important;gap:32px!important}html.as-stack .as-scroll column-unit{width:60vw!important;max-width:60vw!important}html.as-stack .as-scroll column-unit[span="4"]{width:85vw!important;max-width:85vw!important}html.as-stack .as-scroll::after{display:none!important}}';
+document.head.appendChild(st);
+function ph(){ return Math.min(innerWidth,screen.width||9999)<760; }
+var checked=0;
+function hold(){ var sc=document.querySelector('.as-scroll'); if(!sc) return;
+if(!ph()){ if(sc.style.getPropertyValue('width')){ sc.style.removeProperty('width'); sc.style.removeProperty('max-width'); sc.style.removeProperty('margin-left'); } return; }
+var vw=document.documentElement.clientWidth, r=sc.getBoundingClientRect();
+if(Math.abs(r.width-vw)>1||Math.abs(r.left)>1){ var ml=parseFloat(getComputedStyle(sc).marginLeft)||0;
+sc.style.setProperty('width',vw+'px','important'); sc.style.setProperty('max-width',vw+'px','important'); sc.style.setProperty('margin-left',(ml-r.left)+'px','important'); }
+var html=document.documentElement; if(html.classList.contains('as-stack')) return;
+checked++; if(checked<6) return;
+var cs=sc.querySelector('column-set'); if(!cs) return; var need=cs.scrollWidth>sc.clientWidth+20;
+if(!need) return; var was=sc.scrollLeft; sc.scrollLeft=was>0?was-1:was+1; var ok=sc.scrollLeft!==was; sc.scrollLeft=was;
+if(!ok) html.classList.add('as-stack'); }
+hold(); setInterval(hold,500); addEventListener('resize',hold);
+})();
 /* v60: drag the project row sideways with the mouse (hand cursor) */
 (function(){
 if(!document.querySelector('style[data-as-drag]')){var s=document.createElement('style'); s.setAttribute('data-as-drag','1');

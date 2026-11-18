@@ -1042,13 +1042,15 @@ ft(); new MutationObserver(window.__asT(ft)).observe(document.documentElement,{c
 })();
 /* v47: Disintegrator slideshow: picture 5s, then the whole video, then repeat */
 (function(){
-var IMG='https://freight.cargo.site/t/original/i/A3170858799313077610738050704968/Screenshot-2026-10-08-at-12.56.25.png';
+/* v61: Cargo's 600px-wide copy of the screenshot (was the 3.4 MB original); falls back to the original if Cargo can't serve it */
+var IMG='https://freight.cargo.site/w/600/i/A3170858799313077610738050704968/Screenshot-2026-10-08-at-12.56.25.png', IMG0='https://freight.cargo.site/t/original/i/A3170858799313077610738050704968/Screenshot-2026-10-08-at-12.56.25.png';
 var VID='https://freight.cargo.site/t/original/i/C3225768213212814699940347946568/2.mp4';
-var PIC_MS=5000, t=null, box=null, im=null, vd=null;
+var PIC_MS=5000, t=null, box=null, im=null, vd=null, seen=false, io=null;
 function show(which){
 if(!box) return; clearTimeout(t);
 im.style.opacity=which==='img'?'1':'0'; vd.style.opacity=which==='vid'?'1':'0';
-if(which==='img'){ try{vd.pause();}catch(e){} t=setTimeout(function(){show('vid');},PIC_MS); return; }
+if(which==='img'){ try{vd.pause();}catch(e){} if(seen) t=setTimeout(function(){show('vid');},PIC_MS); return; }
+if(!vd.getAttribute('src')){ vd.src=VID; }
 try{vd.currentTime=0;}catch(e){}
 var p=vd.play(); if(p&&p.catch) p.catch(function(){});
 t=setTimeout(function(){ show('img'); },15000);
@@ -1060,13 +1062,14 @@ if(box&&box.isConnected&&box.parentNode===wk) return;
 [].forEach.call(wk.querySelectorAll('.as-dz'),function(o){o.remove();});
 box=document.createElement('div'); box.className='as-dz';
 box.style.cssText='display:grid;width:100%;align-items:end';
-im=document.createElement('img'); im.src=IMG; im.alt='Disintegrator';
-vd=document.createElement('video'); vd.src=VID; vd.muted=true; vd.playsInline=true; vd.preload='metadata';
+im=document.createElement('img'); im.loading='lazy'; im.decoding='async'; im.alt='Disintegrator'; im.addEventListener('error',function(){ if(im.src!==IMG0) im.src=IMG0; }); im.src=IMG;
+vd=document.createElement('video'); vd.muted=true; vd.playsInline=true; vd.preload='none';   // v61: the video file only downloads once the project row is on screen
 vd.setAttribute('muted',''); vd.setAttribute('playsinline','');
 [im,vd].forEach(function(el){ el.style.cssText='grid-area:1/1;width:100%;height:auto;display:block;transition:none'; box.appendChild(el); });
 vd.addEventListener('ended',function(){ show('img'); });
 wk.insertBefore(box,wk.firstChild);
 show('img');
+if(io) io.disconnect(); if('IntersectionObserver' in window){ io=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting&&!seen){ seen=true; show('img'); } }); },{rootMargin:'200px'}); io.observe(box); } else { seen=true; show('img'); }
 }
 build(); new MutationObserver(window.__asT(build)).observe(document.documentElement,{childList:true,subtree:true});
 })();

@@ -29,7 +29,7 @@ var pl=document.createElement('link'); pl.rel='preload'; pl.as='font'; pl.type='
 /* v60h: photos are web-sized copies in this repo. The table photo starts loading first; the About photos load when the page is idle, so About opens instantly */
 var IMG=BASE.replace('/fonts/','/img/');
 (new Image()).src=IMG+'table.jpg';
-window.addEventListener('load',function(){ setTimeout(function(){ ['about-1.jpg','about-2.jpg'].forEach(function(f){ var i=new Image(); i.decoding='async'; i.src=IMG+f; }); },1500); });
+window.addEventListener('load',function(){ setTimeout(function(){ ['about-1-137.jpg','about-2.jpg'].forEach(function(f){ var i=new Image(); i.decoding='async'; i.src=IMG+f; }); },1500); });
 /* three.js starts downloading now, alongside the chess data, instead of after it */
 window.__asThree=function(){var s=document.querySelector('script[data-three]'); if(s) return s;
 s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'; s.async=true; s.setAttribute('data-three','1');
@@ -610,7 +610,7 @@ var LINKEDIN='https://www.linkedin.com/in/alice-smith-/';
   
 var IG='https://www.instagram.com/aesmth/';
   
-var PHOTO1='https://cdn.jsdelivr.net/gh/alsmthstudio2/chess-pieces@main/img/about-1.jpg';
+var PHOTO1='https://cdn.jsdelivr.net/gh/alsmthstudio2/chess-pieces@main/img/about-1-137.jpg';
   
 var PHOTO2='https://cdn.jsdelivr.net/gh/alsmthstudio2/chess-pieces@main/img/about-2.jpg';
   

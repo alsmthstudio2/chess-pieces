@@ -1043,8 +1043,8 @@ ft(); new MutationObserver(window.__asT(ft)).observe(document.documentElement,{c
 })();
 /* v47: Disintegrator slideshow: picture 5s, then the whole video, then repeat */
 (function(){
-/* v61: Cargo's 600px-wide copy of the screenshot (was the 3.4 MB original); falls back to the original if Cargo can't serve it */
-var IMG='https://freight.cargo.site/w/600/i/A3170858799313077610738050704968/Screenshot-2026-10-08-at-12.56.25.png', IMG0='https://freight.cargo.site/t/original/i/A3170858799313077610738050704968/Screenshot-2026-10-08-at-12.56.25.png';
+/* v61g: 800px JPG of the screenshot from this repo (was the 3.4 MB Cargo PNG); falls back to Cargo's original if it can't load */
+var IMG=(window.__asImg||'https://cdn.jsdelivr.net/gh/alsmthstudio2/chess-pieces@main/img/')+'disintegrator-800.jpg', IMG0='https://freight.cargo.site/t/original/i/A3170858799313077610738050704968/Screenshot-2026-10-08-at-12.56.25.png';
 var VID='https://freight.cargo.site/t/original/i/C3225768213212814699940347946568/2.mp4';
 var PIC_MS=5000, t=null, box=null, im=null, vd=null, seen=false, io=null;
 function show(which){

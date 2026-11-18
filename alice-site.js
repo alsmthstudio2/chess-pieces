@@ -1029,7 +1029,7 @@ deco(); new MutationObserver(window.__asT(deco)).observe(document.documentElemen
  
 /* v67c: no scroll snapping on the phone row (Safari can keep re-snapping while Cargo resizes slideshows); the row keeps Cargo's own width, as in v66 */
 /* v66: on narrow phones (under 420px) "Creative strategy" and "Alice Smith" shrink a little so they don't overlap. v67: iPhones no longer enlarge some text on their own (that made the index lines different sizes) */
-(function(){ var st=document.createElement('style'); st.setAttribute('data-as-narrow','1'); st.textContent=(window.__asOff.tsa?'':'html{-webkit-text-size-adjust:100%;text-size-adjust:100%}')+'@media (max-width:420px){html body .asc .asc-title.asc-title{font-size:min(20px,4.4vw)!important}html body .ab-open.ab-open{font-size:min(20px,4.4vw)!important}}'; document.head.appendChild(st); })();
+(function(){ var st=document.createElement('style'); st.setAttribute('data-as-narrow','1'); st.textContent=(window.__asOff.tsa?'':'html,html body,html bodycopy,html .as-index,html .as-index *{-webkit-text-size-adjust:100%!important;text-size-adjust:100%!important}@media (max-width:760px){html .as-index td,html .as-index td *{line-height:1.4!important}html .as-index tbody tr:not(.as-yr) td:nth-child(2),html .as-index tbody tr:not(.as-yr) td:nth-child(3){font-size:14px!important}html .as-index td *{font-size:inherit!important}}')+'@media (max-width:420px){html body .asc .asc-title.asc-title{font-size:min(20px,4.4vw)!important}html body .ab-open.ab-open{font-size:min(20px,4.4vw)!important}}'; document.head.appendChild(st); })();
 /* v60: one left and right edge for the whole page, taken from "Creative strategy" and "Alice Smith" */
 (function(){
 var st=null, last='';
@@ -1078,6 +1078,21 @@ document.head.appendChild(st);
 function stop(e){ if(e.type.indexOf('pointer')===0&&e.pointerType==='mouse') return; if(Math.min(innerWidth,screen.width||9999)>=760) return;
 var t=e.target; if(t&&t.closest&&t.closest('.as-scroll')) e.stopPropagation(); }
 ['touchstart','touchmove','touchend','pointerdown','pointermove','pointerup'].forEach(function(n){ document.addEventListener(n,stop,{capture:true,passive:true}); });
+})();
+/* v68c: backup swipe for the phone row. If something on the page blocks the normal sideways scroll, the row follows the finger anyway
+   (when the normal scroll works, the row is already where the finger is and this does nothing) */
+(function(){
+if(window.__asOff.row) return;
+var sc=null,x0=0,y0=0,l0=0,dir=0,lx=0,lt=0,v=0,forced=false,raf=0;
+function ph(){ return Math.min(innerWidth,screen.width||9999)<760; }
+window.addEventListener('touchstart',function(e){ if(!ph()||e.touches.length!==1) return; var el=e.target.closest&&e.target.closest('.as-scroll'); if(!el||el.scrollWidth<=el.clientWidth+1){sc=null;return;}
+cancelAnimationFrame(raf); sc=el; x0=lx=e.touches[0].clientX; y0=e.touches[0].clientY; l0=el.scrollLeft; dir=0; v=0; forced=false; lt=Date.now(); },{capture:true,passive:true});
+window.addEventListener('touchmove',function(e){ if(!sc) return; var t=e.touches[0], dx=t.clientX-x0, dy=t.clientY-y0;
+if(!dir){ if(Math.abs(dx)<6&&Math.abs(dy)<6) return; dir=Math.abs(dx)>Math.abs(dy)?1:2; }
+if(dir!==1) return; var now=Date.now(); v=(t.clientX-lx)/Math.max(1,now-lt); lx=t.clientX; lt=now;
+var target=Math.max(0,Math.min(sc.scrollWidth-sc.clientWidth,l0-dx)); if(Math.abs(sc.scrollLeft-target)>2){ sc.scrollLeft=target; forced=true; } },{capture:true,passive:true});
+window.addEventListener('touchend',function(){ if(!sc) return; var el=sc; sc=null; if(!forced||dir!==1) return; var vel=v*16;
+(function glide(){ vel*=0.92; if(Math.abs(vel)<0.5) return; el.scrollLeft-=vel; raf=requestAnimationFrame(glide); })(); },{capture:true,passive:true});
 })();
 /* v60: drag the project row sideways with the mouse (hand cursor) */
 (function(){

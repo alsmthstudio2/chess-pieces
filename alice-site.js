@@ -70,8 +70,23 @@ const n=w<760; nst.media=n?'all':'not all'; tst.media=w<420?'all':'not all'; wst
   
 if(n!==wasN){wasN=n; svg.style.display=n?'none':'';}
 }
+/* v66: page layout for the section (phone styles, full width, pulled to the top) runs on its own, so it is right even while the 3D waits */
+let preOn=true, preHost=null;
+function preFind(el){let e=el.parentElement;while(e&&e!==document.body&&e!==document.documentElement){const s=getComputedStyle(e);if(/(auto|scroll)/.test(s.overflowY)&&e.scrollHeight>e.clientHeight+1)return e;e=e.parentElement;}return document.body;}
+const preSvg={style:{}};
+function prePlace(){if(!preOn)return; const cs=document.querySelector('.asc'); if(!cs)return;
+if(!document.querySelector('style[data-asc]'))addStyle(); if(!document.querySelector('style[data-asc8]'))addStyle8();
+let r=cs.getBoundingClientRect(); if(!r.width)return; narrow(r.width,preSvg); r=cs.getBoundingClientRect();
+if(!preHost||!preHost.isConnected)preHost=preFind(cs);
+const host=preHost, hb=host===document.body; let T;
+if(hb&&getComputedStyle(document.body).position==='static'){T=r.top+window.scrollY;} else {const h=host.getBoundingClientRect();T=r.top-h.top-host.clientTop+host.scrollTop;}
+const cm=getComputedStyle(cs), hl=hb?0:host.getBoundingClientRect().left+host.clientLeft, hw=hb?document.documentElement.clientWidth:host.clientWidth, dl=r.left-hl;
+if(Math.abs(dl)>0.5||Math.abs(r.width-hw)>0.5){cs.style.setProperty('margin-left',(parseFloat(cm.marginLeft)-dl)+'px','important');cs.style.setProperty('width',hw+'px','important');cs.style.setProperty('max-width','none','important');}
+if(Math.abs(T)>0.5){cs.style.setProperty('margin-top',(parseFloat(cm.marginTop)-T)+'px','important');}}
+prePlace(); (function loop(){ if(!preOn) return; prePlace(); setTimeout(loop,250); })(); addEventListener('resize',function(){prePlace();});
 /* v60: Google Fonts removed; headline font is set at the top of this file */
 function start(){
+preOn=false; wasN=null;
 const T=THREE;
 /* Cargo redraws its page and removes anything added to it, so the 3D canvas and the lines live in their own layer
    
@@ -133,13 +148,15 @@ if(key!==lastKey){lastKey=key; layout();}
 return true;
 }
 const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* v66: phones get a lighter 3D shadow (smaller, simpler), so it starts and runs faster */
+const PHONE=window.innerWidth<760;
 const renderer=new T.WebGLRenderer({canvas,alpha:true,antialias:true});
 renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,window.innerWidth<760?1.5:2));
 renderer.outputEncoding=T.sRGBEncoding;
 renderer.toneMapping=T.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.05;
 renderer.shadowMap.enabled=true;
-renderer.shadowMap.type=T.PCFSoftShadowMap;
+renderer.shadowMap.type=PHONE?T.PCFShadowMap:T.PCFSoftShadowMap;
 const scene=new T.Scene();
 const camera=new T.PerspectiveCamera(26,1,0.1,200);
 camera.position.set(0,15,9.5);
@@ -163,7 +180,7 @@ scene.add(new T.HemisphereLight(0xffffff,0x888888,0.35));
 const sun=new T.DirectionalLight(0xffffff,1.25);
 sun.position.set(-5,14,6);
 sun.castShadow=true;
-sun.shadow.mapSize.set(window.innerWidth<760?1024:2048,window.innerWidth<760?1024:2048);
+sun.shadow.mapSize.set(PHONE?512:2048,PHONE?512:2048);
 sun.shadow.radius=6;
 sun.shadow.bias=-0.0004;
 scene.add(sun);
@@ -523,7 +540,12 @@ setFinish('satin');
 [solidM,dashM,headM].forEach(m=>m.opacity=0.45);   // faint table lines
 frame();
 }
-function boot(){if(!window.__asShown){window.__asWhenShown(boot);return;} if(window.THREE){start();return;} const s=window.__asThree(); s.addEventListener('load',function(){start();},{once:true});}
+/* v66: WAIT3D = when the 3D starts. 'none' = straight away, 'phone' = phones wait for the first touch or scroll, 'all' = every device waits for the first scroll, touch, mouse move or key */
+const WAIT3D='phone';
+let waited=false;
+function needWait(){if(waited||WAIT3D==='none')return false; if(WAIT3D==='all')return true; return Math.min(window.innerWidth||9999,(window.screen&&screen.width)||9999)<760||(window.matchMedia&&matchMedia('(pointer:coarse)').matches&&!matchMedia('(pointer:fine)').matches);}
+function whenActive(f){const ev=['scroll','wheel','touchstart','pointerdown','pointermove','keydown'];let done=false;function go(){if(done)return;done=true;ev.forEach(n=>removeEventListener(n,go,true));waited=true;if(!window.THREE)window.__asThree();setTimeout(f,0);}ev.forEach(n=>addEventListener(n,go,{capture:true,passive:true}));}
+function boot(){if(!window.__asShown){window.__asWhenShown(boot);return;} if(needWait()){whenActive(boot);return;} if(window.THREE){start();return;} const s=window.__asThree(); s.addEventListener('load',function(){start();},{once:true});}
 /* v31: chess piece data is stored compressed (same pieces, smaller page code); unpack it, then start */
 let unpacked=false; function unpack(){if(unpacked)return; unpacked=true; const Z=window.__ascZ,bin=atob(Z.d),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
 new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer().then(function(buf){const P={};let o=0;Object.keys(Z.m).forEach(function(k){const m=Z.m[k],e={s:m.s,h:m.h,i32:m.i32};['p','n','i'].forEach(function(f){e[f]=new Uint8Array(buf,o,m[f]);o+=m[f];});P[k]=e;});window.__ascPieces=P;boot();});}
@@ -1001,6 +1023,8 @@ document.addEventListener('click',function(e){var d=e.target.closest&&e.target.c
 deco(); new MutationObserver(window.__asT(deco)).observe(document.documentElement,{childList:true,subtree:true});
 })();
  
+/* v66: on narrow phones (under 420px) "Creative strategy" and "Alice Smith" shrink a little so they don't overlap */
+(function(){ var st=document.createElement('style'); st.setAttribute('data-as-narrow','1'); st.textContent='@media (max-width:420px){html body .asc .asc-title.asc-title{font-size:min(20px,4.4vw)!important}html body .ab-open.ab-open{font-size:min(20px,4.4vw)!important}}'; document.head.appendChild(st); })();
 /* v60: one left and right edge for the whole page, taken from "Creative strategy" and "Alice Smith" */
 (function(){
 var st=null, last='';

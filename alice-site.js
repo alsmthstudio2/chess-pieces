@@ -6,7 +6,7 @@ var BASE='https://cdn.jsdelivr.net/gh/alsmthstudio2/chess-pieces@main/fonts/';
 var HF='"Garamondt",Georgia,serif';
 var HF_FACES=[['Garamondt','Garamondt-Regular.woff2','normal'],['Garamondt','Garamondt-Italic.woff2','italic']];
 if(!document.querySelector('style[data-as-hf]')){
-var css=':root{--as-hf:'+HF+'}\n';
+var css=':root{--as-hf:'+HF+'}\nhtml body .asc .asc-h{text-transform:uppercase}\n';
 HF_FACES.forEach(function(f){css+='@font-face{font-family:"'+f[0]+'";src:url('+BASE+f[1]+') format("woff2");font-style:'+f[2]+';font-weight:400;font-display:swap}\n';});
 var st=document.createElement('style'); st.setAttribute('data-as-hf','1'); st.textContent=css; document.head.appendChild(st);
 var pl=document.createElement('link'); pl.rel='preload'; pl.as='font'; pl.type='font/woff2'; pl.crossOrigin='anonymous'; pl.href=BASE+HF_FACES[0][1]; document.head.appendChild(pl);
@@ -524,7 +524,7 @@ let o=hit.object;while(o&&!holders.includes(o))o=o.parent; if(o){o.userData.vel=
 },{passive:true});
 function flip(h){}
 /* v60: idle spin. SPIN = radians per second (0.1 = one turn in about a minute); SPIN_MS = ms between frames while only idling (66 = 15 fps) */
-const SPIN=0.1, SPIN_MS=66, SPIN_HOVER=0.15;   // SPIN_HOVER: speed while the mouse is on a piece (was 0.5)
+const SPIN=0.1, SPIN_MS=66, SPIN_HOVER=0.3;   // SPIN_HOVER: speed while the mouse is on a piece or its card (was 0.5)
 function frame(){
   
 refresh(); if(!place()){requestAnimationFrame(frame);return;}

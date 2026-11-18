@@ -6,7 +6,7 @@ var BASE='https://cdn.jsdelivr.net/gh/alsmthstudio2/chess-pieces@main/fonts/';
 var HF='"Garamondt",Georgia,serif';
 var HF_FACES=[['Garamondt','Garamondt-Regular.woff2','normal'],['Garamondt','Garamondt-Italic.woff2','italic']];
 if(!document.querySelector('style[data-as-hf]')){
-var css=':root{--as-hf:'+HF+'}\nhtml body .asc .asc-h.asc-h{text-transform:uppercase!important;font-size:17px!important;letter-spacing:.09em!important;line-height:1.2!important}\n';
+var css=':root{--as-hf:'+HF+'}\n';
 HF_FACES.forEach(function(f){css+='@font-face{font-family:"'+f[0]+'";src:url('+BASE+f[1]+') format("woff2");font-style:'+f[2]+';font-weight:400;font-display:swap}\n';});
 var st=document.createElement('style'); st.setAttribute('data-as-hf','1'); st.textContent=css; document.head.appendChild(st);
 var pl=document.createElement('link'); pl.rel='preload'; pl.as='font'; pl.type='font/woff2'; pl.crossOrigin='anonymous'; pl.href=BASE+HF_FACES[0][1]; document.head.appendChild(pl);

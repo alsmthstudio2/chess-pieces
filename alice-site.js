@@ -524,7 +524,7 @@ let o=hit.object;while(o&&!holders.includes(o))o=o.parent; if(o){o.userData.vel=
 },{passive:true});
 function flip(h){}
 /* v60: idle spin. SPIN = radians per second (0.1 = one turn in about a minute); SPIN_MS = ms between frames while only idling (66 = 15 fps) */
-const SPIN=0.1, SPIN_MS=66;
+const SPIN=0.1, SPIN_MS=66, SPIN_HOVER=0.15;   // SPIN_HOVER: speed while the mouse is on a piece (was 0.5)
 function frame(){
   
 refresh(); if(!place()){requestAnimationFrame(frame);return;}
@@ -552,7 +552,7 @@ eul.set(p.tx, 0, p.tz); h.quaternion.copy(camera.quaternion).multiply(qt.setFrom
     
 const on=hoverId===p.id;
     
-u.vel+=(((on&&!reduce)?0.5:(reduce?0:SPIN))-u.vel)*Math.min(1,dt*1.5);
+u.vel+=(((on&&!reduce)?SPIN_HOVER:(reduce?0:SPIN))-u.vel)*Math.min(1,dt*1.5);
     
 u.ang+=u.vel*dt;
     

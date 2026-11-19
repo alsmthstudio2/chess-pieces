@@ -1014,6 +1014,8 @@ ft(); new MutationObserver(window.__asT(ft)).observe(document.documentElement,{c
 })();
 /* v47: Disintegrator slideshow: picture 10s (v64, was 5s), then the whole video, then repeat */
 (function(){
+/* v74: Cargo runs this file twice; two copies of this part kept removing each other's picture+video box (Safari never finished loading). Only the first copy runs now */
+if(window.__asDzOn) return; window.__asDzOn=1;
 var IMG=(window.__asImg||'https://cdn.jsdelivr.net/gh/alsmthstudio2/chess-pieces@main/img/')+'disintegrator-800.jpg';   // v62: 800px JPG (was the 3.4 MB PNG); otherwise unchanged from v60
 var VID='https://freight.cargo.site/t/original/i/X3236772765742577142339671205448/disintegrator2-800.mp4';   // v65: 800px copy, 0.8 MB (was 7.4 MB)
 var PIC_MS=10000, t=null, box=null, im=null, vd=null;

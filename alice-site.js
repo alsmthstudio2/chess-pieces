@@ -1031,7 +1031,7 @@ if(box&&box.isConnected&&box.parentNode===wk) return;
 [].forEach.call(wk.querySelectorAll('.as-dz'),function(o){o.remove();});
 box=document.createElement('div'); box.className='as-dz';
 box.style.cssText='display:grid;width:100%;align-items:end';
-im=document.createElement('img'); im.loading='lazy'; im.src=IMG; im.alt='Disintegrator';   // v69: lazy, so it doesn't compete with the opening photo
+im=document.createElement('img'); im.src=IMG; im.alt='Disintegrator';   // v69b: not lazy (lazy made the poster glitch)
 vd=document.createElement('video'); vd.src=VID; vd.muted=true; vd.playsInline=true; vd.preload='metadata';
 vd.setAttribute('muted',''); vd.setAttribute('playsinline','');
 [im,vd].forEach(function(el){ el.style.cssText='grid-area:1/1;width:100%;height:auto;display:block;transition:none'; box.appendChild(el); });

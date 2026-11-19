@@ -86,7 +86,8 @@ if(hb&&getComputedStyle(document.body).position==='static'){T=r.top+window.scrol
 const cm=getComputedStyle(cs), hl=hb?0:host.getBoundingClientRect().left+host.clientLeft, hw=hb?document.documentElement.clientWidth:host.clientWidth, dl=r.left-hl;
 if(Math.abs(dl)>0.5||Math.abs(r.width-hw)>0.5){cs.style.setProperty('margin-left',(parseFloat(cm.marginLeft)-dl)+'px','important');cs.style.setProperty('width',hw+'px','important');cs.style.setProperty('max-width','none','important');}
 if(Math.abs(T)>0.5){cs.style.setProperty('margin-top',(parseFloat(cm.marginTop)-T)+'px','important');}}
-prePlace(); (function loop(){ if(!preOn) return; prePlace(); setTimeout(loop,250); })(); addEventListener('resize',function(){prePlace();});
+/* v69c: while the 3D waits, the section is re-placed before every frame for the first 10 seconds (as the 3D used to do), so a late change above it is corrected before it is drawn and nothing visibly jumps; after that, 4 times a second */
+prePlace(); {const t0=Date.now(); (function loop(){ if(!preOn) return; prePlace(); if(Date.now()-t0<10000) requestAnimationFrame(loop); else setTimeout(loop,250); })();} addEventListener('resize',function(){prePlace();});
 /* v60: Google Fonts removed; headline font is set at the top of this file */
 async function start(){
 preOn=false; wasN=null;

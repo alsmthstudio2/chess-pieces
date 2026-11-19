@@ -36,12 +36,13 @@ var pl=document.createElement('link'); pl.rel='preload'; pl.as='font'; pl.type='
 /* v60h: photos are web-sized copies in this repo. The table photo starts loading first; the About photos load when the page is idle, so About opens instantly */
 var IMG=BASE.replace('/fonts/','/img/'); window.__asImg=IMG;
 /* v61d: phones get a 1200px table photo (sharp at phone size, 30% smaller); 3D library downloads after the photo, so the photo shows first */
-window.__asTable=Math.min(window.innerWidth||9999,(window.screen&&screen.width)||9999)<760?'table-1200.jpg':'table.jpg';
-var tp=new Image(); tp.onload=tp.onerror=function(){ if(!window.THREE) window.__asThree(); }; tp.src=IMG+window.__asTable; setTimeout(function(){ if(!window.THREE) window.__asThree(); },2500);
+/* v69: the photo size follows the screen width (same rule as the preload in the page code, so it downloads once); the 3D library now loads only when the 3D starts */
+window.__asTable=(window.matchMedia?matchMedia('(max-width: 759px)').matches:(window.innerWidth||9999)<760)?'table-1200.jpg':'table.jpg';
+var tp=new Image(); tp.fetchPriority='high'; tp.src=IMG+window.__asTable;
 window.__abLoad=function(){ var a=document.querySelectorAll('.ab-sheet img[data-ab-src]'); if(!a.length){ ['about-1-137.jpg','about-2.jpg'].forEach(function(f){ var i=new Image(); i.decoding='async'; i.src=IMG+f; }); return; } for(var k=0;k<a.length;k++){ if(!a[k].getAttribute('src')) a[k].setAttribute('src',a[k].getAttribute('data-ab-src')); } };
 /* v65: About photos download only when someone heads for the About button (hover, touch or keyboard), not on every visit */
 (function(){ var done=0; function pre(e){ if(done) return; var t=e&&e.target; if(!t||!t.closest||!t.closest('.ab-open')) return; done=1; window.__abLoad(); } ['pointerover','touchstart','focusin'].forEach(function(n){ document.addEventListener(n,pre,{passive:true,capture:true}); }); })();
-/* three.js starts downloading now, alongside the chess data, instead of after it */
+/* window.__asThree() adds the 3D library (v69: called only when the 3D is about to start) */
 window.__asThree=function(){var s=document.querySelector('script[data-three]'); if(s) return s;
 s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'; s.async=true; s.setAttribute('data-three','1');
 s.addEventListener('load',function(){s.setAttribute('data-loaded','1');}); document.head.appendChild(s); return s;};
@@ -87,7 +88,7 @@ if(Math.abs(dl)>0.5||Math.abs(r.width-hw)>0.5){cs.style.setProperty('margin-left
 if(Math.abs(T)>0.5){cs.style.setProperty('margin-top',(parseFloat(cm.marginTop)-T)+'px','important');}}
 prePlace(); (function loop(){ if(!preOn) return; prePlace(); setTimeout(loop,250); })(); addEventListener('resize',function(){prePlace();});
 /* v60: Google Fonts removed; headline font is set at the top of this file */
-function start(){
+async function start(){
 preOn=false; wasN=null;
 const T=THREE;
 /* Cargo redraws its page and removes anything added to it, so the 3D canvas and the lines live in their own layer
@@ -158,7 +159,15 @@ renderer.outputEncoding=T.sRGBEncoding;
 renderer.toneMapping=T.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.05;
 renderer.shadowMap.enabled=true;
-renderer.shadowMap.type=PHONE?T.PCFShadowMap:T.PCFSoftShadowMap;
+/* v69: on computers without a graphics card (software drawing) the 3D uses the lighter phone shadow and 1x pixels, so it can't freeze the page */
+const SOFT=(function(){try{const gl=renderer.getContext(),ex=gl.getExtension('WEBGL_debug_renderer_info');return /swiftshader|llvmpipe|software|softpipe/i.test(ex?String(gl.getParameter(ex.UNMASKED_RENDERER_WEBGL)):'');}catch(e){return false;}})();
+if(SOFT)renderer.setPixelRatio(1);
+renderer.shadowMap.type=(PHONE||SOFT)?T.PCFShadowMap:T.PCFSoftShadowMap;
+/* v69: shaders are built in the background (the browser's parallel compile), so the page never freezes while the 3D gets ready. glReady waits until they are done */
+renderer.debug.checkShaderErrors=false;
+function glReady(){return new Promise(function(res){const gl=renderer.getContext(),ext=gl.getExtension('KHR_parallel_shader_compile'),t0=Date.now(); if(!ext){res();return;}
+(function poll(){const ps=renderer.info.programs||[]; let ok=Date.now()-t0>8000; if(!ok){ok=true; for(let i=0;i<ps.length;i++){if(!gl.getProgramParameter(ps[i].program,ext.COMPLETION_STATUS_KHR)){ok=false;break;}}} if(ok)res(); else setTimeout(poll,25);})();});}
+const tick=()=>new Promise(r=>setTimeout(r,0));
 const scene=new T.Scene();
 /* v68b: phones only. PHONE_SIZE makes all pieces bigger; PHONE_SZ gives each piece its own size on top (1 = same). Desktop is unchanged */
 const PHONE_SIZE=1.4, PHONE_SZ={king:1.12,queen:1.05,knight:1,rook:0.95,rookB:0.88,pawnB:0.8};
@@ -184,7 +193,7 @@ scene.add(new T.HemisphereLight(0xffffff,0x888888,0.35));
 const sun=new T.DirectionalLight(0xffffff,1.25);
 sun.position.set(-5,14,6);
 sun.castShadow=true;
-sun.shadow.mapSize.set(PHONE?512:2048,PHONE?512:2048);
+sun.shadow.mapSize.set((PHONE||SOFT)?512:2048,(PHONE||SOFT)?512:2048);
 sun.shadow.radius=6;
 sun.shadow.bias=-0.0004;
 scene.add(sun);
@@ -542,18 +551,34 @@ requestAnimationFrame(frame);
 }
 setFinish('satin');
 [solidM,dashM,headM].forEach(m=>m.opacity=0.45);   // faint table lines
+/* v69: build every shader the first picture needs (pieces, shadows, table lines) in the background, then draw */
+await tick();
+{const tmp=[new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(),new T.Vector3(1,0,0)]),solidM),new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(),new T.Vector3(1,0,0)]),dashM),new T.Mesh(new T.BufferGeometry().setFromPoints([new T.Vector3(),new T.Vector3(1,0,0),new T.Vector3(0,0,1)]),headM)];
+tmp[1].computeLineDistances(); tmp.forEach(o=>scene.add(o));
+try{renderer.compile(scene,camera);}catch(e){}
+tmp.forEach(o=>{scene.remove(o);o.geometry.dispose();});}
+await glReady();
 frame();
 }
 /* v66: WAIT3D = when the 3D starts. 'none' = straight away, 'phone' = phones wait for the first touch or scroll, 'all' = every device waits for the first scroll, touch, mouse move or key */
 const WAIT3D='phone';
 let waited=false;
-function needWait(){if(waited||WAIT3D==='none')return false; if(WAIT3D==='all')return true; return Math.min(window.innerWidth||9999,(window.screen&&screen.width)||9999)<760||(window.matchMedia&&matchMedia('(pointer:coarse)').matches&&!matchMedia('(pointer:fine)').matches);}
-function whenActive(f){const ev=['scroll','wheel','touchstart','pointerdown','pointermove','keydown'];let done=false;function go(){if(done)return;done=true;ev.forEach(n=>removeEventListener(n,go,true));waited=true;if(!window.THREE)window.__asThree();setTimeout(f,0);}ev.forEach(n=>addEventListener(n,go,{capture:true,passive:true}));}
-function boot(){if(!window.__asShown){window.__asWhenShown(boot);return;} if(needWait()){whenActive(boot);return;} if(window.THREE){start();return;} const s=window.__asThree(); s.addEventListener('load',function(){start();},{once:true});}
-/* v31: chess piece data is stored compressed (same pieces, smaller page code); unpack it, then start */
-let unpacked=false; function unpack(){if(unpacked)return; unpacked=true; const Z=window.__ascZ,bin=atob(Z.d),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
-new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer().then(function(buf){const P={};let o=0;Object.keys(Z.m).forEach(function(k){const m=Z.m[k],e={s:m.s,h:m.h,i32:m.i32};['p','n','i'].forEach(function(f){e[f]=new Uint8Array(buf,o,m[f]);o+=m[f];});P[k]=e;});window.__ascPieces=P;boot();});}
-if(window.__ascPieces)boot(); else if(window.__ascZ)unpack(); else {window.__ascZready=unpack; if(!document.querySelector('script[data-ascz]')){const s=document.createElement('script'); s.src=(window.__asBase||'https://cdn.jsdelivr.net/gh/alsmthstudio2/chess-pieces@main/fonts/').replace(/fonts\/$/,'chess-data.js'); s.async=true; s.setAttribute('data-ascz','1'); document.head.appendChild(s);}}
+/* v69: computers that draw 3D without a graphics card (software drawing, e.g. PageSpeed's test machine) also wait for the first mouse move, scroll or key: there the 3D setup froze the page for about 2 seconds */
+let softV=null;
+function soft(){if(softV===null){softV=false; try{const c=document.createElement('canvas'),g=c.getContext('webgl',{failIfMajorPerformanceCaveat:true}); if(!g)softV=true; else {const ex=g.getExtension('WEBGL_debug_renderer_info'); softV=/swiftshader|llvmpipe|software|softpipe/i.test(ex?String(g.getParameter(ex.UNMASKED_RENDERER_WEBGL)):''); const l=g.getExtension('WEBGL_lose_context'); if(l)l.loseContext();}}catch(e){}} return softV;}
+function isPhone(){return Math.min(window.innerWidth||9999,(window.screen&&screen.width)||9999)<760||(window.matchMedia&&matchMedia('(pointer:coarse)').matches&&!matchMedia('(pointer:fine)').matches);}
+function needWait(){if(waited||WAIT3D==='none')return false; if(WAIT3D==='all')return true; return isPhone()||soft();}
+function whenActive(f){const ev=['scroll','wheel','touchstart','pointerdown','pointermove','keydown'];let done=false;function go(){if(done)return;done=true;ev.forEach(n=>removeEventListener(n,go,true));waited=true;setTimeout(f,0);}ev.forEach(n=>addEventListener(n,go,{capture:true,passive:true}));}
+/* v69: the 3D library and the chess piece data download only once the 3D is about to start (after the page is shown), so they never hold up the first picture */
+function boot(){if(!window.__asShown){window.__asWhenShown(boot);return;} if(needWait()){whenActive(boot);return;} go();}
+let going=false;
+function go(){if(going)return; going=true; let n=2; const done=function(){if(--n===0)start();};
+if(window.__ascPieces)done(); else {window.__ascZready=function(){unpack(done);}; if(window.__ascZ)unpack(done); else if(!document.querySelector('script[data-ascz]')){const s=document.createElement('script'); s.src=(window.__asBase||'https://cdn.jsdelivr.net/gh/alsmthstudio2/chess-pieces@main/fonts/').replace(/fonts\/$/,'chess-data.js'); s.async=true; s.setAttribute('data-ascz','1'); document.head.appendChild(s);}}
+if(window.THREE)done(); else {const s=window.__asThree(); if(s.getAttribute('data-loaded'))done(); else s.addEventListener('load',done,{once:true});}}
+/* v31: chess piece data is stored compressed (same pieces, smaller page code); unpack it */
+let unpacked=false; function unpack(cb){if(unpacked)return; unpacked=true; const Z=window.__ascZ,bin=atob(Z.d),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+new Response(new Blob([u]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer().then(function(buf){const P={};let o=0;Object.keys(Z.m).forEach(function(k){const m=Z.m[k],e={s:m.s,h:m.h,i32:m.i32};['p','n','i'].forEach(function(f){e[f]=new Uint8Array(buf,o,m[f]);o+=m[f];});P[k]=e;});window.__ascPieces=P;cb();});}
+boot();
 })();
 /* v32: ABOUT side sheet (opens when ABOUT is clicked) */
 (function(){
@@ -1006,7 +1031,7 @@ if(box&&box.isConnected&&box.parentNode===wk) return;
 [].forEach.call(wk.querySelectorAll('.as-dz'),function(o){o.remove();});
 box=document.createElement('div'); box.className='as-dz';
 box.style.cssText='display:grid;width:100%;align-items:end';
-im=document.createElement('img'); im.src=IMG; im.alt='Disintegrator';
+im=document.createElement('img'); im.loading='lazy'; im.src=IMG; im.alt='Disintegrator';   // v69: lazy, so it doesn't compete with the opening photo
 vd=document.createElement('video'); vd.src=VID; vd.muted=true; vd.playsInline=true; vd.preload='metadata';
 vd.setAttribute('muted',''); vd.setAttribute('playsinline','');
 [im,vd].forEach(function(el){ el.style.cssText='grid-area:1/1;width:100%;height:auto;display:block;transition:none'; box.appendChild(el); });
